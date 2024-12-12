@@ -55,7 +55,7 @@ app.delete('/tasks/:id', (req, res) => {
 });
 
 const PORT = 3000;
-const PUBLIC_IP = '18.212.221.211';
+const PUBLIC_IP = 'yourPublicIp';
 app.listen(PORT, () => {
     console.log(`🎉 Server running on http://${PUBLIC_IP}:${PORT} 🎉`);
 });
