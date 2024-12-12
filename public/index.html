@@ -3,32 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>To-Do List</title>
+    <title>Happy To-Do List</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Simple To-Do List</h1>
-    <form id="taskForm">
-        <label for="description">Task:</label>
-        <input type="text" id="description" placeholder="Task description" required>
-        <label for="dueDate">Due Date:</label>
-        <input type="date" id="dueDate" required>
-        <button type="submit">Add Task</button>
-    </form>
-
-    <h2>Tasks</h2>
-    <ul id="taskList"></ul>
+    <div class="container">
+        <h1>🎉 My Happy To-Do List 🎉</h1>
+        <form id="taskForm" class="task-form">
+            <input type="text" id="description" placeholder="What do you need to do?" required>
+            <input type="date" id="dueDate" required>
+            <button type="submit">Add Task</button>
+        </form>
+        <h2>Overdue Tasks</h2>
+        <ul id="overdueTasks"></ul>
+        <h2>Pending Tasks</h2>
+        <ul id="pendingTasks"></ul>
+        <h2>Completed Tasks</h2>
+        <ul id="completedTasks"></ul>
+    </div>
 
     <script>
         async function fetchTasks() {
-            const res = await fetch('/tasks');
-            const tasks = await res.json();
-            const taskList = document.getElementById('taskList');
-            taskList.innerHTML = '';
+            const response = await fetch('/tasks');
+            const tasks = await response.json();
+            document.getElementById('overdueTasks').innerHTML = '';
+            document.getElementById('pendingTasks').innerHTML = '';
+            document.getElementById('completedTasks').innerHTML = '';
+            const now = new Date();
+
             tasks.forEach(task => {
-                const li = document.createElement('li');
-                const status = task.completed ? 'Completed' : (new Date(task.dueDate) < new Date() ? 'Overdue' : 'Pending');
-                li.textContent = `${task.description} - Due: ${task.dueDate} - Status: ${status}`;
-                taskList.appendChild(li);
+                const taskItem = document.createElement('li');
+                taskItem.className = 'task-item';
+                const formattedDate = new Date(task.dueDate).toLocaleDateString('en-US');
+                taskItem.innerHTML = `<span>${task.description} - Due: ${formattedDate}</span>`;
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.onclick = async () => {
+                    await fetch(`/tasks/${task.id}`, { method: 'DELETE' });
+                    fetchTasks();
+                };
+                taskItem.appendChild(deleteBtn);
+
+                if (!task.completed) {
+                    const completeBtn = document.createElement('button');
+                    completeBtn.textContent = 'Mark as Complete';
+                    completeBtn.className = 'complete-btn';
+                    completeBtn.onclick = async () => {
+                        await fetch(`/tasks/${task.id}/complete`, { method: 'PUT' });
+                        fetchTasks();
+                    };
+                    taskItem.appendChild(completeBtn);
+                    if (new Date(task.dueDate) < now) {
+                        document.getElementById('overdueTasks').appendChild(taskItem);
+                    } else {
+                        document.getElementById('pendingTasks').appendChild(taskItem);
+                    }
+                } else {
+                    document.getElementById('completedTasks').appendChild(taskItem);
+                }
             });
         }
 
@@ -41,6 +75,8 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ description, dueDate })
             });
+            document.getElementById('description').value = '';
+            document.getElementById('dueDate').value = '';
             fetchTasks();
         });
 
@@ -48,4 +84,3 @@
     </script>
 </body>
 </html>
- 
