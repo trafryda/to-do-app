@@ -6,8 +6,6 @@ Step 2. Create an RDS MySQL database and connect it to your EC2 instance.
 
 Step 3. Connect to your EC2 instance. You can do this through the browser or the terminal:
 
-    ssh -i "your-key.pem" ec2-user@your-ec2-public-ip
-
 Step 4. On your EC2 instance, make sure git, npm, and mariadb105 are all installed. If on Linux this can be done by running:
 
     sudo yum install git -y
