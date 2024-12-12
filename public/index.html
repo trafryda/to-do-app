@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+</head>
+<body>
+    <h1>Simple To-Do List</h1>
+    <form id="taskForm">
+        <label for="description">Task:</label>
+        <input type="text" id="description" placeholder="Task description" required>
+        <label for="dueDate">Due Date:</label>
+        <input type="date" id="dueDate" required>
+        <button type="submit">Add Task</button>
+    </form>
+
+    <h2>Tasks</h2>
+    <ul id="taskList"></ul>
+
+    <script>
+        async function fetchTasks() {
+            const res = await fetch('/tasks');
+            const tasks = await res.json();
+            const taskList = document.getElementById('taskList');
+            taskList.innerHTML = '';
+            tasks.forEach(task => {
+                const li = document.createElement('li');
+                const status = task.completed ? 'Completed' : (new Date(task.dueDate) < new Date() ? 'Overdue' : 'Pending');
+                li.textContent = `${task.description} - Due: ${task.dueDate} - Status: ${status}`;
+                taskList.appendChild(li);
+            });
+        }
+
+        document.getElementById('taskForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const description = document.getElementById('description').value;
+            const dueDate = document.getElementById('dueDate').value;
+            await fetch('/tasks', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ description, dueDate })
+            });
+            fetchTasks();
+        });
+
+        fetchTasks();
+    </script>
+</body>
+</html>
+ 
