@@ -11,7 +11,7 @@ app.use(express.static('public')); // Serve the static index.html file
 const db = mysql.createConnection({
     host: 'tododatabase.cby4e4amwp4k.us-east-1.rds.amazonaws.com',
     user: 'admin',
-    password: 'Tf#31931',
+    password: 'Rose#31931',
     database: 'tododatabase'
 });
 
